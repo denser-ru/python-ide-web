@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Python Web IDE</title>
+
+  <!-- CodeMirror & Dracula Theme -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/dracula.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/hint/show-hint.min.css">
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/python/python.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/hint/show-hint.min.js"></script>
+
+  <!-- Skulpt (Turtle Engine) -->
+  <script src="https://cdn.jsdelivr.net/npm/skulpt@1.2.0/dist/skulpt.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/skulpt@1.2.0/dist/skulpt-stdlib.js"></script>
+
+  <!-- Pyodide (Pygame CE Engine) -->
+  <script src="https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js"></script>
+  <script type="module" crossorigin src="/python-ide-web/assets/index-aza8gZO7.js"></script>
+  <link rel="stylesheet" crossorigin href="/python-ide-web/assets/index-0-Hx0KjE.css">
+</head>
+<body>
+
+  <header>
+    <div class="header-left">
+      <div class="brand">🐍 Python Studio</div>
+      
+      <!-- Выбор среды выполнения -->
+      <select id="engine-select" class="select-box">
+        <option value="turtle">🐢 Модуль Turtle</option>
+        <option value="pygame">🎮 Модуль Pygame</option>
+      </select>
+
+      <!-- Менеджер локальных проектов -->
+      <select id="project-select" class="select-box"></select>
+      <button class="btn btn-icon" id="btn-new-project" title="Новый проект">➕</button>
+      <button class="btn btn-icon" id="btn-delete-project" title="Удалить проект">🗑️</button>
+    </div>
+
+    <div class="header-right">
+      <span id="status-badge" class="badge">Готов</span>
+      <button class="btn btn-secondary" id="btn-share">🔗 Поделиться</button>
+      <button class="btn btn-secondary" id="btn-save-file">💾 В файл</button>
+      <button class="btn btn-stop" id="btn-stop" disabled>⏹ Стоп</button>
+      <button class="btn btn-run" id="btn-run">▶ Запустить</button>
+    </div>
+  </header>
+
+  <main class="workspace">
+    <!-- Левая панель: редактор -->
+    <section class="panel panel-editor">
+      <div class="panel-header">
+        <span id="current-filename">main.py</span>
+        <span class="editor-hint">Ctrl + Space для подсказок</span>
+      </div>
+      <div class="editor-container">
+        <textarea id="code"></textarea>
+      </div>
+    </section>
+
+    <!-- Правая панель: вывод и холсты -->
+    <section class="panel panel-preview">
+      <div class="panel-header">Результат исполнения</div>
+      
+      <!-- Холст для Turtle -->
+      <div id="turtle-wrapper" class="canvas-box">
+        <div id="turtle-canvas" width="480" height="360"></div>
+      </div>
+
+      <!-- Холст для Pygame -->
+      <div id="pygame-wrapper" class="canvas-box" style="display: none;">
+        <canvas id="pygame-canvas" width="400" height="300" tabindex="-1"></canvas>
+      </div>
+
+      <!-- Консоль -->
+      <div class="console-box">
+        <div class="console-header">Вывод терминала:</div>
+        <pre id="console-output"></pre>
+      </div>
+    </section>
+  </main>
+
+</body>
+</html>

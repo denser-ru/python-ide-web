@@ -1,0 +1,60 @@
+(function(){const r=document.createElement("link").relList;if(r&&r.supports&&r.supports("modulepreload"))return;for(const d of document.querySelectorAll('link[rel="modulepreload"]'))f(d);new MutationObserver(d=>{for(const h of d)if(h.type==="childList")for(const _ of h.addedNodes)_.tagName==="LINK"&&_.rel==="modulepreload"&&f(_)}).observe(document,{childList:!0,subtree:!0});function l(d){const h={};return d.integrity&&(h.integrity=d.integrity),d.referrerPolicy&&(h.referrerPolicy=d.referrerPolicy),d.crossOrigin==="use-credentials"?h.credentials="include":d.crossOrigin==="anonymous"?h.credentials="omit":h.credentials="same-origin",h}function f(d){if(d.ep)return;d.ep=!0;const h=l(d);fetch(d.href,h)}})();const F="python_studio_projects_v1",N=[{id:"default-turtle",name:"Черепашка: Спираль",engine:"turtle",code:`import turtle
+
+t = turtle.Turtle()
+t.shape("turtle")
+t.speed(5)
+t.pensize(2)
+
+colors = ["#e63946", "#f4a261", "#2a9d8f", "#457b9d", "#7209b7"]
+
+for i in range(40):
+    t.pencolor(colors[i % len(colors)])
+    t.forward(i * 4)
+    t.right(59)
+
+print("Спираль нарисована!")`},{id:"default-pygame",name:"Pygame: Шарик",engine:"pygame",code:`import pygame
+import asyncio
+
+async def main():
+    pygame.init()
+    screen = pygame.display.set_mode((400, 300))
+    clock = pygame.time.Clock()
+
+    x, y, vx, vy = 200, 150, 3, 2
+    radius = 16
+
+    running = True
+    while running:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+
+        x += vx
+        y += vy
+        if x - radius <= 0 or x + radius >= 400: vx = -vx
+        if y - radius <= 0 or y + radius >= 300: vy = -vy
+
+        screen.fill((30, 30, 46))
+        pygame.draw.circle(screen, (166, 227, 161), (int(x), int(y)), radius)
+        pygame.display.flip()
+        await asyncio.sleep(0.016)
+
+    pygame.quit()
+
+asyncio.ensure_future(main())`}],b={getProjects(){const t=localStorage.getItem(F);return t?JSON.parse(t):N},saveProjects(t){localStorage.setItem(F,JSON.stringify(t))},updateProjectCode(t,r){const l=this.getProjects(),f=l.find(d=>d.id===t);f&&(f.code=r,this.saveProjects(l))},createProject(t,r){const l=this.getProjects(),f={id:"proj_"+Date.now(),name:t,engine:r,code:r==="turtle"?`import turtle
+t = turtle.Turtle()
+`:`import pygame
+`};return l.push(f),this.saveProjects(l),f},deleteProject(t){let r=this.getProjects();return r.length<=1?null:(r=r.filter(l=>l.id!==t),this.saveProjects(r),r[0])}};function Q(t){return t&&t.__esModule&&Object.prototype.hasOwnProperty.call(t,"default")?t.default:t}var q={exports:{}};(function(t){var r=function(){var l=String.fromCharCode,f="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=",d="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+-$",h={};function _(n,o){if(!h[n]){h[n]={};for(var u=0;u<n.length;u++)h[n][n.charAt(u)]=u}return h[n][o]}var j={compressToBase64:function(n){if(n==null)return"";var o=j._compress(n,6,function(u){return f.charAt(u)});switch(o.length%4){default:case 0:return o;case 1:return o+"===";case 2:return o+"==";case 3:return o+"="}},decompressFromBase64:function(n){return n==null?"":n==""?null:j._decompress(n.length,32,function(o){return _(f,n.charAt(o))})},compressToUTF16:function(n){return n==null?"":j._compress(n,15,function(o){return l(o+32)})+" "},decompressFromUTF16:function(n){return n==null?"":n==""?null:j._decompress(n.length,16384,function(o){return n.charCodeAt(o)-32})},compressToUint8Array:function(n){for(var o=j.compress(n),u=new Uint8Array(o.length*2),i=0,c=o.length;i<c;i++){var v=o.charCodeAt(i);u[i*2]=v>>>8,u[i*2+1]=v%256}return u},decompressFromUint8Array:function(n){if(n==null)return j.decompress(n);for(var o=new Array(n.length/2),u=0,i=o.length;u<i;u++)o[u]=n[u*2]*256+n[u*2+1];var c=[];return o.forEach(function(v){c.push(l(v))}),j.decompress(c.join(""))},compressToEncodedURIComponent:function(n){return n==null?"":j._compress(n,6,function(o){return d.charAt(o)})},decompressFromEncodedURIComponent:function(n){return n==null?"":n==""?null:(n=n.replace(/ /g,"+"),j._decompress(n.length,32,function(o){return _(d,n.charAt(o))}))},compress:function(n){return j._compress(n,16,function(o){return l(o)})},_compress:function(n,o,u){if(n==null)return"";var i,c,v={},E={},S="",P="",y="",w=2,g=3,p=2,m=[],e=0,a=0,s;for(s=0;s<n.length;s+=1)if(S=n.charAt(s),Object.prototype.hasOwnProperty.call(v,S)||(v[S]=g++,E[S]=!0),P=y+S,Object.prototype.hasOwnProperty.call(v,P))y=P;else{if(Object.prototype.hasOwnProperty.call(E,y)){if(y.charCodeAt(0)<256){for(i=0;i<p;i++)e=e<<1,a==o-1?(a=0,m.push(u(e)),e=0):a++;for(c=y.charCodeAt(0),i=0;i<8;i++)e=e<<1|c&1,a==o-1?(a=0,m.push(u(e)),e=0):a++,c=c>>1}else{for(c=1,i=0;i<p;i++)e=e<<1|c,a==o-1?(a=0,m.push(u(e)),e=0):a++,c=0;for(c=y.charCodeAt(0),i=0;i<16;i++)e=e<<1|c&1,a==o-1?(a=0,m.push(u(e)),e=0):a++,c=c>>1}w--,w==0&&(w=Math.pow(2,p),p++),delete E[y]}else for(c=v[y],i=0;i<p;i++)e=e<<1|c&1,a==o-1?(a=0,m.push(u(e)),e=0):a++,c=c>>1;w--,w==0&&(w=Math.pow(2,p),p++),v[P]=g++,y=String(S)}if(y!==""){if(Object.prototype.hasOwnProperty.call(E,y)){if(y.charCodeAt(0)<256){for(i=0;i<p;i++)e=e<<1,a==o-1?(a=0,m.push(u(e)),e=0):a++;for(c=y.charCodeAt(0),i=0;i<8;i++)e=e<<1|c&1,a==o-1?(a=0,m.push(u(e)),e=0):a++,c=c>>1}else{for(c=1,i=0;i<p;i++)e=e<<1|c,a==o-1?(a=0,m.push(u(e)),e=0):a++,c=0;for(c=y.charCodeAt(0),i=0;i<16;i++)e=e<<1|c&1,a==o-1?(a=0,m.push(u(e)),e=0):a++,c=c>>1}w--,w==0&&(w=Math.pow(2,p),p++),delete E[y]}else for(c=v[y],i=0;i<p;i++)e=e<<1|c&1,a==o-1?(a=0,m.push(u(e)),e=0):a++,c=c>>1;w--,w==0&&(w=Math.pow(2,p),p++)}for(c=2,i=0;i<p;i++)e=e<<1|c&1,a==o-1?(a=0,m.push(u(e)),e=0):a++,c=c>>1;for(;;)if(e=e<<1,a==o-1){m.push(u(e));break}else a++;return m.join("")},decompress:function(n){return n==null?"":n==""?null:j._decompress(n.length,32768,function(o){return n.charCodeAt(o)})},_decompress:function(n,o,u){var i=[],c=4,v=4,E=3,S="",P=[],y,w,g,p,m,e,a,s={val:u(0),position:o,index:1};for(y=0;y<3;y+=1)i[y]=y;for(g=0,m=Math.pow(2,2),e=1;e!=m;)p=s.val&s.position,s.position>>=1,s.position==0&&(s.position=o,s.val=u(s.index++)),g|=(p>0?1:0)*e,e<<=1;switch(g){case 0:for(g=0,m=Math.pow(2,8),e=1;e!=m;)p=s.val&s.position,s.position>>=1,s.position==0&&(s.position=o,s.val=u(s.index++)),g|=(p>0?1:0)*e,e<<=1;a=l(g);break;case 1:for(g=0,m=Math.pow(2,16),e=1;e!=m;)p=s.val&s.position,s.position>>=1,s.position==0&&(s.position=o,s.val=u(s.index++)),g|=(p>0?1:0)*e,e<<=1;a=l(g);break;case 2:return""}for(i[3]=a,w=a,P.push(a);;){if(s.index>n)return"";for(g=0,m=Math.pow(2,E),e=1;e!=m;)p=s.val&s.position,s.position>>=1,s.position==0&&(s.position=o,s.val=u(s.index++)),g|=(p>0?1:0)*e,e<<=1;switch(a=g){case 0:for(g=0,m=Math.pow(2,8),e=1;e!=m;)p=s.val&s.position,s.position>>=1,s.position==0&&(s.position=o,s.val=u(s.index++)),g|=(p>0?1:0)*e,e<<=1;i[v++]=l(g),a=v-1,c--;break;case 1:for(g=0,m=Math.pow(2,16),e=1;e!=m;)p=s.val&s.position,s.position>>=1,s.position==0&&(s.position=o,s.val=u(s.index++)),g|=(p>0?1:0)*e,e<<=1;i[v++]=l(g),a=v-1,c--;break;case 2:return P.join("")}if(c==0&&(c=Math.pow(2,E),E++),i[a])S=i[a];else if(a===v)S=w+w.charAt(0);else return null;P.push(S),i[v++]=w+S.charAt(0),c--,w=S,c==0&&(c=Math.pow(2,E),E++)}}};return j}();t!=null?t.exports=r:typeof angular<"u"&&angular!=null&&angular.module("LZString",[]).factory("LZString",function(){return r})})(q);var Y=q.exports;const J=Q(Y);function X(t,r){const l=J.compressToEncodedURIComponent(r),f=new URL(window.location.href);return f.hash=`engine=${t}&code=${l}`,f.toString()}function V(){const t=window.location.hash.substring(1);if(!t)return null;const r=new URLSearchParams(t),l=r.get("engine"),f=r.get("code");if(!f)return null;try{const d=J.decompressFromEncodedURIComponent(f);return{engine:l||"turtle",code:d}}catch(d){return console.error("Ошибка парсинга ссылки",d),null}}const K={run(t,r,l,f){const d=document.getElementById("turtle-canvas");d.innerHTML="",r.textContent="";function h(n){r.textContent+=n,r.scrollTop=r.scrollHeight}function _(n){if(Sk.builtinFiles===void 0||Sk.builtinFiles.files[n]===void 0)throw new Error(`File not found: '${n}'`);return Sk.builtinFiles.files[n]}Sk.pre="console-output",Sk.configure({output:h,read:_,__future__:Sk.python3}),(Sk.TurtleGraphics||(Sk.TurtleGraphics={})).target="turtle-canvas",Sk.TurtleGraphics.width=480,Sk.TurtleGraphics.height=360,Sk.misceval.asyncToPromise(()=>Sk.importMainWithBody("<stdin>",!1,t,!0)).then(l,f)},stop(){const t=document.getElementById("turtle-canvas");t.innerHTML=""}};let x=null,G=!1;const z={async init(t,r){if(G)return x;t("Загрузка Pyodide..."),x=await loadPyodide({stdout:f=>r(f),stderr:f=>r(f,!0)}),t("Загрузка pygame-ce..."),x._api._skip_unwind_fatal_error=!0,await x.loadPackage("pygame-ce");const l=document.getElementById("pygame-canvas");return x.canvas.setCanvas2D(l),G=!0,t("Готов"),x},async run(t,r,l){await this.stop(),document.getElementById("pygame-canvas").focus();try{await x.runPythonAsync(t)}catch(d){d.toString().includes("CancelledError")||(l(`
+Ошибка:
+`+d.message,!0),r("Ошибка"))}},async stop(){if(x)try{await x.runPythonAsync(`
+import asyncio, pygame
+for t in asyncio.all_tasks():
+    t.cancel()
+try:
+    pygame.quit()
+except:
+    pass
+      `)}catch{}}},B=CodeMirror.fromTextArea(document.getElementById("code"),{mode:"python",theme:"dracula",lineNumbers:!0,indentUnit:4,lineWrapping:!0,extraKeys:{"Ctrl-Space":"autocomplete"}}),L=document.getElementById("status-badge"),O=document.getElementById("console-output"),k=document.getElementById("engine-select"),U=document.getElementById("project-select"),T=document.getElementById("btn-run"),A=document.getElementById("btn-stop"),ee=document.getElementById("btn-share"),te=document.getElementById("btn-save-file"),ne=document.getElementById("btn-new-project"),re=document.getElementById("btn-delete-project"),H=document.getElementById("turtle-wrapper"),Z=document.getElementById("pygame-wrapper");let M=null;function D(t,r=!1){const l=document.createElement("div");r&&(l.style.color="#f38ba8"),l.textContent=t,O.appendChild(l),O.scrollTop=O.scrollHeight}function $(t){k.value=t,t==="turtle"?(H.style.display="flex",Z.style.display="none"):(H.style.display="none",Z.style.display="flex",z.init(r=>L.textContent=r,D))}function C(){const t=b.getProjects();U.innerHTML="",t.forEach(r=>{const l=document.createElement("option");l.value=r.id,l.textContent=r.name,U.appendChild(l)})}function I(t){const l=b.getProjects().find(f=>f.id===t);l&&(M=l.id,U.value=l.id,B.setValue(l.code),$(l.engine))}let W=null;B.on("change",()=>{clearTimeout(W),W=setTimeout(()=>{M&&b.updateProjectCode(M,B.getValue())},800)});T.addEventListener("click",async()=>{const t=B.getValue();O.textContent="",T.disabled=!0,A.disabled=!1,L.textContent="Работает...",k.value==="turtle"?K.run(t,O,()=>{L.textContent="Готово",T.disabled=!1,A.disabled=!0},r=>{D(`
+Ошибка:
+`+r.toString(),!0),L.textContent="Ошибка",T.disabled=!1,A.disabled=!0}):(await z.run(t,r=>L.textContent=r,D),T.disabled=!1,A.disabled=!0)});A.addEventListener("click",async()=>{k.value==="turtle"?K.stop():await z.stop(),L.textContent="Остановлено",T.disabled=!1,A.disabled=!0});ee.addEventListener("click",()=>{const t=X(k.value,B.getValue());navigator.clipboard.writeText(t),alert(`Ссылка на ваш код скопирована в буфер обмена!
+Отправьте её преподавателю.`)});te.addEventListener("click",()=>{const t=new Blob([B.getValue()],{type:"text/x-python;charset=utf-8"}),r=document.createElement("a");r.href=URL.createObjectURL(t),r.download=`${U.selectedOptions[0].text}.py`,r.click(),URL.revokeObjectURL(r.href)});ne.addEventListener("click",()=>{const t=prompt("Название нового проекта:","Мой проект");if(!t)return;const r=b.createProject(t,k.value);C(),I(r.id)});re.addEventListener("click",()=>{if(confirm("Точно удалить этот проект?")){const t=b.deleteProject(M);t&&(C(),I(t.id))}});U.addEventListener("change",t=>I(t.target.value));k.addEventListener("change",t=>$(t.target.value));const R=V();C();if(R){const t=b.createProject("Код по ссылке",R.engine);b.updateProjectCode(t.id,R.code),C(),I(t.id)}else{const t=b.getProjects();I(t[0].id)}
