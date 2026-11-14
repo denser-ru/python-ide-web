@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Python Web IDE</title>
+
+  <!-- CodeMirror & Dracula Theme -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/dracula.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/hint/show-hint.min.css">
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/python/python.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/hint/show-hint.min.js"></script>
+
+  <!-- Skulpt (Turtle Engine) -->
+  <script src="https://cdn.jsdelivr.net/npm/skulpt@1.2.0/dist/skulpt.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/skulpt@1.2.0/dist/skulpt-stdlib.js"></script>
+
+  <!-- Pyodide (Pygame CE Engine) -->
+  <script src="https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js"></script>
+  <script type="module" crossorigin src="/python-ide-web/assets/index-BeoyJD5w.js"></script>
+  <link rel="stylesheet" crossorigin href="/python-ide-web/assets/index-DzkTSWjm.css">
+</head>
+<body>
+
+  <!-- Скрытые файловые контролы для загрузки пакетов курса (.pack + student_config.json) и уроков в RAM -->
+  <input id="pack-files-input" type="file" accept=".pack,.json" multiple hidden>
+  <input id="lesson-files-input" type="file" accept=".pack,.html,.htm,.md,.markdown,.pdf,.json" multiple hidden>
+  <input id="lesson-folder-input" type="file" webkitdirectory directory multiple hidden>
+
+  <header class="topbar">
+    <div class="header-left">
+      <div class="brand">🐍 Python Studio</div>
+
+      <!-- Переключатель рабочих станций IDE -->
+      <nav id="station-switcher" class="station-switcher" aria-label="Рабочие станции IDE">
+        <ul class="station-switcher-list">
+          <li class="station-switcher-item is-active">
+            <button type="button" class="station-tab-btn" data-station="student" aria-current="page">🎓 Ученик</button>
+          </li>
+          <li class="station-switcher-item">
+            <button type="button" class="station-tab-btn" data-station="teacher">👩‍🏫 Учитель</button>
+          </li>
+          <li class="station-switcher-item">
+            <button type="button" class="station-tab-btn" data-station="packer">📦 Студия</button>
+          </li>
+        </ul>
+      </nav>
+
+      <!-- Управление пакетами курса (.pack) и уроками в оперативной памяти (RAM) -->
+      <div class="toolbar-group" role="group" aria-label="Материалы урока" data-station-only="student">
+        <button type="button" class="btn btn-primary" id="btn-load-pack" title="Загрузить пакет курса (.pack) и профиль ученика (student_config.json)">📦 Курс (.pack)</button>
+        <select id="lesson-select" class="select-box select-lesson" aria-label="Выбор урока" disabled>
+          <option value="">Уроки не загружены</option>
+        </select>
+        <button type="button" class="btn btn-icon" id="btn-reload-lesson" title="Перезапустить урок" aria-label="Перезапустить урок" disabled>🔄</button>
+      </div>
+
+      <!-- Переключатель режимов рабочего пространства -->
+      <div class="mode-switcher" role="group" aria-label="Режим отображения" data-station-only="student">
+        <button type="button" class="btn btn-mode" id="btn-mode-presentation" aria-pressed="false">🖥 Презентация</button>
+        <button type="button" class="btn btn-mode" id="btn-mode-split" aria-pressed="false">🌗 Сплит</button>
+        <button type="button" class="btn btn-mode active" id="btn-mode-ide" aria-pressed="true">💻 Код</button>
+      </div>
+
+      <!-- Выбор среды выполнения и менеджер локальных проектов -->
+      <div class="toolbar-group" role="group" aria-label="Среда и проекты" data-station-only="student">
+        <select id="engine-select" class="select-box" aria-label="Среда выполнения">
+          <option value="turtle">🐢 Модуль Turtle</option>
+          <option value="pygame">🎮 Модуль Pygame</option>
+        </select>
+
+        <select id="project-select" class="select-box" aria-label="Локальный проект"></select>
+        <button type="button" class="btn btn-icon" id="btn-new-project" title="Новый проект" aria-label="Новый проект">➕</button>
+        <button type="button" class="btn btn-icon" id="btn-delete-project" title="Удалить проект" aria-label="Удалить проект">🗑️</button>
+      </div>
+    </div>
+
+    <div class="header-right">
+      <span id="status-badge" class="badge">Готов</span>
+      <button type="button" class="btn btn-secondary" id="btn-export-state" data-station-only="student">📊 Отчёт JSON</button>
+      <button type="button" class="btn btn-secondary btn-header-more" id="btn-header-more" popovertarget="header-more-popover" aria-label="Дополнительные действия" title="Дополнительные материалы и экспорт" data-station-only="student">⋯</button>
+      <div id="header-more-popover" class="header-more-popover" popover="auto" data-station-only="student">
+        <button type="button" class="btn btn-secondary" id="btn-load-lessons" title="Загрузить уроки (.html, .md, .pdf) или манифест">📂 Уроки</button>
+        <button type="button" class="btn btn-secondary" id="btn-load-folder" title="Загрузить папку с уроками">📁 Папка</button>
+        <button type="button" class="btn btn-secondary" id="btn-share">🔗 Поделиться</button>
+        <button type="button" class="btn btn-secondary" id="btn-save-file">💾 В файл</button>
+      </div>
+      <button type="button" class="btn btn-stop" id="btn-stop" disabled data-station-only="student">⏹ Стоп</button>
+      <button type="button" class="btn btn-secondary" id="btn-test" title="Проверить решение (Ctrl+Shift+Enter)" aria-label="Проверить решение (Ctrl+Shift+Enter)" data-station-only="student">🧪 Проверить</button>
+      <button type="button" class="btn btn-run" id="btn-run" data-station-only="student">▶ Запустить</button>
+    </div>
+  </header>
+
+  <main id="app-main" class="app-main">
+    <section id="student-station-view" class="student-station-view" aria-label="Рабочая станция ученика">
+      <div id="impersonation-banner" class="impersonation-banner" role="status" hidden>
+        <span id="impersonation-banner-text" class="impersonation-banner-text"></span>
+        <button type="button" id="btn-exit-impersonation" class="btn btn-secondary btn-compact">Выйти</button>
+      </div>
+
+      <div id="sub-activity-ribbon-container" class="sub-activity-ribbon-host" hidden></div>
+
+      <div id="workspace" class="workspace" data-view-mode="ide" data-task-drawer="closed">
+        <div id="task-drawer-backdrop" class="task-drawer-backdrop" aria-hidden="true" hidden></div>
+
+        <!-- Панель интерактивного урока / курса (.pack: HTML, Markdown, PDF в оперативной памяти RAM) -->
+        <section id="panel-lesson" class="panel panel-lesson">
+          <div class="panel-header">
+            <span id="current-lesson-title">Интерактивный материал</span>
+            <div class="panel-header-actions">
+              <span class="editor-hint">Оперативная память (RAM)</span>
+              <button type="button" id="btn-close-task-drawer" class="btn btn-icon btn-close-task-drawer" aria-label="Закрыть панель ТЗ (Esc)" title="Закрыть панель ТЗ (Esc)">✕</button>
+            </div>
+          </div>
+          <div class="lesson-panel-body">
+            <div id="course-outline-container" class="course-outline-container" hidden></div>
+            <div class="lesson-viewer-stage">
+              <div id="lesson-empty-state" class="lesson-empty-state">
+                <p class="lesson-empty-title">Учебный модуль не выбран</p>
+                <p class="lesson-empty-hint">Нажмите «📦 Курс (.pack)» или перетащите <code>*.pack</code> + <code>student_config.json</code> (либо <code>.html</code>, <code>.md</code>, <code>.pdf</code> материалы) в окно браузера.</p>
+              </div>
+              <div id="lesson-frame-container" class="lesson-frame-container" hidden></div>
+            </div>
+          </div>
+        </section>
+
+        <div id="workspace-splitter" class="workspace-splitter" role="separator" aria-orientation="vertical" aria-valuemin="20" aria-valuemax="80" aria-valuenow="50" tabindex="0" aria-label="Разделитель панелей (Стрелки влево/вправо для изменения размера, двойной клик для 50/50)"></div>
+
+        <!-- Панель редактора кода -->
+        <section id="panel-editor" class="panel panel-editor">
+          <div class="panel-header">
+            <span id="current-filename">main.py</span>
+            <div class="panel-header-actions">
+              <button type="button" id="btn-toggle-task-drawer" class="btn btn-secondary btn-toggle-task-drawer" aria-expanded="false" aria-controls="panel-lesson" title="Показать или скрыть условие задания (Ctrl+H)">📋 ТЗ (Ctrl+H)</button>
+              <span class="editor-hint">Ctrl + Space для подсказок</span>
+            </div>
+          </div>
+          <div class="editor-container">
+            <textarea id="code"></textarea>
+          </div>
+        </section>
+
+        <!-- Панель вывода и холстов -->
+        <section id="panel-preview" class="panel panel-preview">
+          <div class="panel-header">Результат исполнения</div>
+
+          <!-- Холст для Turtle -->
+          <div id="turtle-wrapper" class="canvas-box">
+            <div id="turtle-canvas" width="480" height="360"></div>
+          </div>
+
+          <!-- Холст для Pygame -->
+          <div id="pygame-wrapper" class="canvas-box" style="display: none;">
+            <canvas id="pygame-canvas" width="400" height="300" tabindex="-1"></canvas>
+          </div>
+
+          <!-- Консоль -->
+          <div class="console-box">
+            <div class="console-header">Вывод терминала:</div>
+            <pre id="console-output"></pre>
+          </div>
+        </section>
+      </div>
+    </section>
+
+    <section id="station-teacher-view" class="station-view station-teacher-view" aria-label="Кабинет учителя" hidden></section>
+    <section id="station-packer-view" class="station-view station-packer-view" aria-label="Студия пакетирования" hidden></section>
+  </main>
+
+</body>
+</html>
